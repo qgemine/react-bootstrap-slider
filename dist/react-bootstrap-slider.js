@@ -147,9 +147,44 @@
                 }
             }
         }, {
+            key: "shouldComponentUpdate",
+            value: function shouldComponentUpdate(nextProps, nextState)
+            {
+                return !(this.props.ticks.toString() === nextProps.ticks.toString());
+            }
+        },
+        {
             key: "componentDidUpdate",
             value: function componentDidUpdate() {
+                var that = this;
+                var sliderAttributes = _extends({}, this.props, {
+                    "tooltip": this.props.tooltip || "show"
+                });
+
+                this.node.previousElementSibling.remove();
+                this.mySlider = new _bootstrapSlider2.default(this.node, sliderAttributes);
+
                 this.updateSliderValues();
+                if (this.props.change || this.props.handleChange) {
+                    var changeEvent = this.props.change || this.props.handleChange;
+                    this.mySlider.on("change", function (e) {
+                        var fakeEvent = {
+                            target: {}
+                        };
+                        fakeEvent.target.value = e.newValue;
+                        changeEvent(fakeEvent);
+                    });
+                }
+
+                if (this.props.slideStop) {
+                    this.mySlider.on("slideStop", function (e) {
+                        var fakeEvent = {
+                            target: {}
+                        };
+                        fakeEvent.target.value = e;
+                        that.props.slideStop(fakeEvent);
+                    });
+                }
             }
         }, {
             key: "updateSliderValues",
